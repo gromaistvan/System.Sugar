@@ -67,11 +67,10 @@
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
+  <Import Project="$(MSBuildProjectDirectory)\..\.build\MSBuild.Community.Tasks.targets"/>
   <Target Name="AfterBuild">
+    <WebDownload Condition="! Exists('nuget.exe')" Filename="nuget.exe" FileUri="https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" />
+    <Exec Command="nuget pack $(TargetName).csproj -Prop Configuration=$(Configuration) -IncludeReferencedProjects" />
+    <Exec Condition=" '$(Configuration)' == 'Release' " Command="nuget push $(TargetName).nupkg -Prop Configuration=$(Configuration)" />
   </Target>
-  -->
 </Project>

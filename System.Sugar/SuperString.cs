@@ -17,10 +17,10 @@
     /// Lots of syntactic sugar over strung usage.
     /// </remarks>
     /// <example>
-    ///     <code>
+    /// <code>
+    /// Superstring str = "some text";
     /// 
-    /// 
-    ///     </code>
+    /// </code>
     /// </example>
     [SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "System.Superstring", Justification = "OK" )]
     [DebuggerDisplay( "{Internal.ToString()}" )]
@@ -331,6 +331,7 @@
         /// <returns>Substring.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Invalid position parameters.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        [SuppressMessage( "Microsoft.Design", "CA1023:IndexersShouldNotBeMultidimensional" )]
         public string this[ int start, int end ]
         {
             get
