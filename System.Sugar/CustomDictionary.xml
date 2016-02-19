@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Dictionary>
+  <Words>
+    <Recognized>
+      <Word></Word>
+      <Word></Word>
+      <Word></Word>
+      <Word></Word>
+    </Recognized>
+    <Deprecated>
+      <Term PreferredAlternate="Login">LogOn</Term>
+      <Term PreferredAlternate="Logout">LogOff</Term>
+    </Deprecated>
+    <Compound>
+      <Term CompoundAlternate="HostName">hostname</Term>
+    </Compound>
+    <DiscreteExceptions>
+      <Term>login</Term>
+      <Term>logoff</Term>
+    </DiscreteExceptions>
+  </Words>
+  <Acronyms>
+    <CasingExceptions>
+      <Acronym>ID</Acronym>
+      <Acronym>IO</Acronym>
+      <Acronym>BIOS</Acronym>
+      <Acronym>API</Acronym>
+    </CasingExceptions>
+  </Acronyms>
+</Dictionary>
