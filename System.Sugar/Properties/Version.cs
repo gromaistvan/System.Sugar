@@ -1,4 +1,4 @@
-﻿namespace System.Sugar
+﻿namespace System.Properties
 {
     static class Version
     {

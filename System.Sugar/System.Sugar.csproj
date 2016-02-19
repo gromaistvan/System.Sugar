@@ -70,7 +70,11 @@
   <Import Project="$(MSBuildProjectDirectory)\..\.build\MSBuild.Community.Tasks.targets"/>
   <Target Name="AfterBuild">
     <WebDownload Condition="! Exists('nuget.exe')" Filename="nuget.exe" FileUri="https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" />
-    <Exec Command="nuget pack $(TargetName).csproj -Prop Configuration=$(Configuration) -IncludeReferencedProjects" />
-    <Exec Condition=" '$(Configuration)' == 'Release' " Command="nuget push $(TargetName).nupkg -Prop Configuration=$(Configuration)" />
+    <CreateItem Include="$(TargetName).*.nupkg">
+      <Output TaskParameter="Include" ItemName="OldPackages" />
+    </CreateItem>
+    <Delete Files="@(OldPackages)" ContinueOnError="WarnAndContinue" />
+    <Exec Command="nuget.exe pack $(TargetName).csproj -Prop Configuration=$(Configuration) -IncludeReferencedProjects" IgnoreStandardErrorWarningFormat="true" />
+    <Exec Condition="'$(Configuration)' == 'Release'" Command="nuget.exe push $(TargetName).*.nupkg -NonInteractive" IgnoreStandardErrorWarningFormat="true" ContinueOnError="WarnAndContinue" />
   </Target>
 </Project>

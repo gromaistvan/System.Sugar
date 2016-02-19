@@ -8,6 +8,8 @@
     <owners>$author$</owners>
     <description>$description$</description>
     <summary>$description$</summary>
+    <language>en-us</language>
+    <projectUrl>https://github.com/gromaistvan/System.Sugar</projectUrl>
     <copyright>Copyright © MGR-Infó Bt. 2016</copyright>
     <tags>framework string</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

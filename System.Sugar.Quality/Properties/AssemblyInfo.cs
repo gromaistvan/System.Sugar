@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using static System.Sugar.Version;
+using static System.Properties.Version;
 
 [assembly: AssemblyProduct( "System.Sugar" )]
 [assembly: AssemblyTitle( "System.Sugar.Quality" )]
