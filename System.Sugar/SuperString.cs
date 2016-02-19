@@ -176,8 +176,18 @@
         /// <returns>The <paramref name="value"/> instance.</returns>
         public static Superstring operator *( Superstring value, int count ) => Multiply( value, count );
 
+        /// <summary>
+        /// Used for the controlling expression in <c>if</c>, <c>do</c>, <c>while</c>, and <c>for</c> statements.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The string is not empty.</returns>
         public static bool operator true( Superstring value ) => value?.IsTrue ?? false;
 
+        /// <summary>
+        /// Used for the controlling expression in <c>if</c>, <c>do</c>, <c>while</c>, and <c>for</c> statements.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The string is empty.</returns>
         public static bool operator false( Superstring value ) => !( value?.IsTrue ?? false );
 
         /// <summary>
@@ -286,6 +296,68 @@
         /// </summary>
         /// <returns>Not empty!</returns>
         public bool IsTrue => ! string.IsNullOrEmpty( Internal.ToString() );
+
+        /// <summary>
+        /// Get character at given position.
+        /// </summary>
+        /// <param name="index">0-based start position.</param>
+        /// <returns>Character at position.</returns>
+        public char this[ int index ]
+        {
+            get
+            {
+                if( index < 0 ) throw new ArgumentOutOfRangeException( nameof( index ) );
+                if( index >= Internal.Length ) throw new ArgumentOutOfRangeException( nameof( index ) );
+
+                return Internal[index];
+            }
+            set
+            {
+                if( index < 0 ) throw new ArgumentOutOfRangeException( nameof( index ) );
+                if( index >= Internal.Length ) throw new ArgumentOutOfRangeException( nameof( index ) );
+
+                lock( Internal )
+                {
+                    Internal[index] = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Slice substring.
+        /// </summary>
+        /// <param name="start">0-based start position (inclusive).</param>
+        /// <param name="end">0-based end position (inclusive).</param>
+        /// <returns>Substring.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Invalid position parameters.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        public string this[ int start, int end ]
+        {
+            get
+            {
+                if( start < 0 ) throw new ArgumentOutOfRangeException( nameof( start ) );
+                if( end < 0 ) throw new ArgumentOutOfRangeException( nameof( end ) );
+                if( start >= Internal.Length ) throw new ArgumentOutOfRangeException( nameof( start ) );
+                if( end >= Internal.Length ) throw new ArgumentOutOfRangeException( nameof( end ) );
+                if( end < start ) throw new ArgumentOutOfRangeException( nameof( end ) );
+
+                return Internal.ToString().Substring( start, end - start );
+            }
+            set
+            {
+                if( value == null ) throw new ArgumentNullException( nameof( value ) );
+                if( start < 0 ) throw new ArgumentOutOfRangeException( nameof( start ) );
+                if( end < 0 ) throw new ArgumentOutOfRangeException( nameof( end ) );
+                if( start >= Internal.Length ) throw new ArgumentOutOfRangeException( nameof( start ) );
+                if( end >= Internal.Length ) throw new ArgumentOutOfRangeException( nameof( end ) );
+                if( end < start ) throw new ArgumentOutOfRangeException( nameof( end ) );
+
+                lock( Internal )
+                {
+                    Internal.Remove(start, end - start).Insert(start, value);
+                }
+            }
+        }
 
         /// <summary>
         /// Convert to <see cref="SecureString"/> for using as password.
