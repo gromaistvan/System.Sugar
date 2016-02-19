@@ -6,8 +6,11 @@
     using Diagnostics.CodeAnalysis;
     using Globalization;
     using JetBrains.Annotations;
+    using Runtime.InteropServices;
     using Security;
+    using Security.Policy;
     using Text;
+    using Text.RegularExpressions;
     using static FormattableString;
 
     /// <summary>
@@ -253,6 +256,20 @@
             }
         }
 
+        /// <summary>
+        /// Join constructor.
+        /// </summary>
+        /// <param name="values">Texts to join.</param>
+        /// <param name="separator">Separator.</param>
+        public Superstring( IEnumerable<string> values, string separator = " " )
+        {
+            foreach( var value in values )
+            {
+                if( Internal.Length > 0 ) Internal.Append( separator );
+                Internal.Append( value );
+            }
+        }
+
         #endregion
 
         #region Object overrides
@@ -290,6 +307,14 @@
         /// The length of the value.
         /// </summary>
         public int Length => Internal.Length;
+
+        public int Words
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         /// <summary>
         /// Empty strings are <c>false</c>.
@@ -383,6 +408,71 @@
                 secure.Dispose();
                 throw;
             }
+        }
+
+        public IEnumerable<string> Split( params char[] chars )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Shuffle( params char[] chars )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Trim( params char[] chars )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Pad( int count, char @char = ' ' )
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool StartsWith( string str, bool caseSeinsitive = true )
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EndsWith( string str, bool caseSeinsitive = true )
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains( string str, bool caseSeinsitive = true )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring ToUpper()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring ToLower()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Wrap( int lineLength, string separator = null )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Replace( string pattern, string replacement )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Replace( IReadOnlyDictionary<string, string> replacements )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Replace( Regex pattern, string replacement )
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -8,7 +8,7 @@
     {
         public TestContext TestContext { get; set; }
 
-        [TestMethod, Timeout(100)]
+        [TestMethod, Timeout( 100 )]
         public void TestCasting()
         {
             Superstring str = "some text";
@@ -19,13 +19,13 @@
         public void TestEmpty()
         {
             Superstring valid = new Superstring( "none" ), empty = new Superstring();
-            if (valid)
+            if( valid )
             { }
             else
             {
                 Fail( "if (valid) -> false" );
             }
-            if (empty)
+            if( empty )
             {
                 Fail( "if( empty ) -> true" );
             }
@@ -34,10 +34,11 @@
         [TestMethod, Timeout( 100 )]
         public void TestLength()
         {
+            const int count = 6;
             var str = new Superstring( "a" );
-            str *= 6;
+            str *= count;
             IsNotNull( str );
-            AreEqual( 6, str.Length );
+            AreEqual( count, str.Length );
         }
     }
 }
