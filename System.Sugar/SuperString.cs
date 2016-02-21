@@ -6,9 +6,7 @@
     using Diagnostics.CodeAnalysis;
     using Globalization;
     using JetBrains.Annotations;
-    using Runtime.InteropServices;
     using Security;
-    using Security.Policy;
     using Text;
     using Text.RegularExpressions;
     using static FormattableString;
@@ -40,13 +38,7 @@
         public static bool Equals( Superstring left, Superstring right ) =>
             ReferenceEquals( left, right )
             ||
-            (
-                ( left != null )
-                &&
-                ( right != null )
-                &&
-                left.Internal.Equals( right.Internal )
-            );
+            ( left?.Internal.Equals( right?.Internal ) ?? false );
 
         /// <summary>
         /// General alphabetic compare.
@@ -471,6 +463,16 @@
         }
 
         public Superstring Replace( Regex pattern, string replacement )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Reverse()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Superstring Shuffle()
         {
             throw new NotImplementedException();
         }

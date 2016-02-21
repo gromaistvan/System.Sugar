@@ -8,14 +8,14 @@
     {
         public TestContext TestContext { get; set; }
 
-        [TestMethod, Timeout( 100 )]
+        [TestMethod, Timeout( TestTimeout.Infinite )]
         public void TestCasting()
         {
             Superstring str = "some text";
             IsNotNull( str );
         }
 
-        [TestMethod, Timeout( 100 )]
+        [TestMethod, Timeout( TestTimeout.Infinite  )]
         public void TestEmpty()
         {
             Superstring valid = new Superstring( "none" ), empty = new Superstring();
@@ -31,7 +31,7 @@
             }
         }
 
-        [TestMethod, Timeout( 100 )]
+        [TestMethod, Timeout( TestTimeout.Infinite  )]
         public void TestLength()
         {
             const int count = 6;
