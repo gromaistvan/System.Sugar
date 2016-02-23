@@ -717,11 +717,13 @@
         public Superstring Reverse()
         {
             throw new NotImplementedException();
+            return this;
         }
 
         public Superstring Shuffle()
         {
             throw new NotImplementedException();
+            return this;
         }
 
         #endregion

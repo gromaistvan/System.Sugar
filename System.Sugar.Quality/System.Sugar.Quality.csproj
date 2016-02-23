@@ -67,6 +67,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ArrayTests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="SuperstringTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
