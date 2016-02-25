@@ -6,6 +6,7 @@
     using Diagnostics.CodeAnalysis;
     using Globalization;
     using JetBrains.Annotations;
+    using Linq;
     using Security;
     using Text;
     using Text.RegularExpressions;
@@ -22,19 +23,21 @@
     ///     <code>
     ///     Superstring str = "Some text";
     ///     str += " to edit.";
-    ///     str[str.Legth - 1] = '!';
+    ///     str[str.Length - 1] = '!';
     ///     </code>
     /// </example>
     [SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type",
         Target = "System.Superstring", Justification = "OK" )]
     [DebuggerDisplay( "{Internal.ToString()}" )]
-    public class Superstring
-        : IEquatable<Superstring>, IComparable<Superstring>, IComparable, ICloneable, IEnumerable<char>, IConvertible
+    public class Superstring : IEquatable<Superstring>, IComparable<Superstring>, IComparable, ICloneable, IEnumerable<char>, IConvertible
     {
         #region Static fields
 
         [NotNull]
-        static readonly char[] _whiteChars = { ' ', '\r', '\n', '\t', '\v', '\f' };
+        static readonly char[] _whiteChars = { ' ', '\t', '\v', '\f', '\n', };
+
+        [NotNull]
+        static readonly char[] _extendedWhiteChars = { ' ', '\t', '\v', '\f', '\n', '\r', };
 
         #endregion
 
@@ -46,6 +49,7 @@
         /// <returns>
         ///     A new object that is a copy of this instance.
         /// </returns>
+        [Pure]
         public object Clone() => MemberwiseClone();
 
         #endregion
@@ -65,6 +69,7 @@
         /// </returns>
         /// <param name="obj">An object to compare with this instance. </param>
         /// <exception cref="ArgumentException"><paramref name="obj" /> is not the same type as this instance.</exception>
+        [Pure]
         public virtual int CompareTo( object obj )
         {
             var other = obj as Superstring;
@@ -91,6 +96,7 @@
         ///     Greater than zero This instance follows <paramref name="other" /> in the sort order.
         /// </returns>
         /// <param name="other">An object to compare with this instance.</param>
+        [Pure]
         public int CompareTo( Superstring other ) => Compare( this, other );
 
         #endregion
@@ -103,6 +109,7 @@
         /// <returns>
         ///     An enumerator that can be used to iterate through the collection.
         /// </returns>
+        [Pure]
         public IEnumerator<char> GetEnumerator() => Internal.ToString().GetEnumerator();
 
         #endregion
@@ -115,6 +122,7 @@
         /// <returns>
         ///     An <see cref="IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
+        [Pure]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
@@ -128,6 +136,7 @@
         ///     true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
         /// </returns>
         /// <param name="other">An object to compare with this object.</param>
+        [Pure]
         public bool Equals( Superstring other ) => Equals( this, other );
 
         #endregion
@@ -140,6 +149,7 @@
         /// <param name="left">A value.</param>
         /// <param name="right">An other value.</param>
         /// <returns>Equivalent?</returns>
+        [Pure]
         public static bool Equals( Superstring left, Superstring right ) =>
             ReferenceEquals( left, right )
             ||
@@ -156,11 +166,12 @@
         ///     Zero <paramref name="left" /> occurs in the same position in the sort order as <paramref name="right" />.
         ///     Greater than zero <paramref name="left" /> follows <paramref name="right" /> in the sort order.
         /// </returns>
-        public static int Compare( Superstring left, Superstring right ) => string.Compare
-            (
-             left?.ToString( CultureInfo.InvariantCulture ),
-             right?.ToString( CultureInfo.InvariantCulture ),
-             OrdinalIgnoreCase );
+        [Pure]
+        public static int Compare( Superstring left, Superstring right ) =>
+            string.Compare(
+                left?.ToString( CultureInfo.InvariantCulture ),
+                right?.ToString( CultureInfo.InvariantCulture ),
+                OrdinalIgnoreCase );
 
         /// <summary>
         ///     Postfix concatenation.
@@ -174,7 +185,11 @@
             {
                 return null;
             }
-            if( value != null )
+            if( value == null )
+            {
+                return @string;
+            }
+            lock( @string.SyncRoot )
             {
                 @string.Internal.Append( value );
             }
@@ -191,10 +206,7 @@
         [SuppressMessage( "ReSharper", "ConvertIfStatementToSwitchStatement", Justification = "OK" )]
         public static Superstring Multiply( Superstring @string, int count )
         {
-            if( count < 0 )
-            {
-                throw new ArgumentOutOfRangeException( nameof( count ), "count must be greater or equal than 0" );
-            }
+            if( count < 0 ) throw new ArgumentOutOfRangeException( nameof( count ), "count must be greater or equal than 0" );
 
             if( @string == null )
             {
@@ -202,17 +214,23 @@
             }
             if( count == 0 )
             {
-                @string.Internal.Clear();
+                lock( @string.SyncRoot )
+                {
+                    @string.Internal.Clear();
+                }
                 return @string;
             }
             if( count == 1 )
             {
                 return @string;
             }
-            var value = @string.Internal.ToString();
-            for( var i = count - 1; i > 0; --i )
+            lock( @string.SyncRoot )
             {
-                @string.Internal.Append( value );
+                var value = @string.Internal.ToString();
+                for( var i = count - 1; i > 0; --i )
+                {
+                    @string.Internal.Append( value );
+                }
             }
             return @string;
         }
@@ -574,19 +592,32 @@
             }
         }
 
+        /// <summary>
+        /// Split string to parts.
+        /// </summary>
+        /// <param name="chars">Separator characters.</param>
+        /// <returns>String parts.</returns>
         public IEnumerable<string> Split( params char[] chars ) => Internal.ToString().Split( chars );
+
+        /// <summary>
+        /// Split string to parts by whitespaces.
+        /// </summary>
+        /// <returns>String parts.</returns>
+        public IEnumerable<string> Split() => Internal.ToString().Split( _whiteChars );
 
         public Superstring Shuffle( params char[] chars )
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Trim specified characters from the begining.
+        /// </summary>
+        /// <param name="chars">Characters to trim.</param>
+        /// <returns>Trimmed string.</returns>
         public Superstring LeftTrim( [NotNull] params char[] chars )
         {
-            if( chars == null )
-            {
-                throw new ArgumentNullException( nameof( chars ) );
-            }
+            if( chars == null ) throw new ArgumentNullException( nameof( chars ) );
 
             for( var c = Internal[ 0 ];
                  Array.BinarySearch( chars, c ) >= 0;
@@ -597,8 +628,17 @@
             return this;
         }
 
-        public Superstring LeftTrim() => LeftTrim( _whiteChars );
+        /// <summary>
+        /// Trim whitespaces from the begining.
+        /// </summary>
+        /// <returns>Trimmed string.</returns>
+        public Superstring LeftTrim() => LeftTrim( _extendedWhiteChars );
 
+        /// <summary>
+        /// Trim specified characters from the end.
+        /// </summary>
+        /// <param name="chars">Characters to trim.</param>
+        /// <returns>Trimmed string.</returns>
         public Superstring RightTrim( params char[] chars )
         {
             if( chars == null )
@@ -615,35 +655,53 @@
             }
             return this;
         }
+        
+        /// <summary>
+        /// Trim whitespaces from the end.
+        /// </summary>
+        /// <returns>Trimmed string.</returns>
+        public Superstring RightTrim() => RightTrim( _extendedWhiteChars );
 
-        public Superstring RightTrim() => RightTrim( _whiteChars );
-
-        public Superstring Pad( int count, char @char = ' ' )
+        public Superstring LeftPad( int count, char @char = ' ' )
         {
             throw new NotImplementedException();
         }
 
-        public bool StartsWith( [NotNull] string str, bool caseSeinsitive = true )
+        public Superstring RightPad( int count, char @char = ' ' )
         {
-            if( str == null )
-            {
-                throw new ArgumentNullException( nameof( str ) );
-            }
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Check string begins with a given text.
+        /// </summary>
+        /// <param name="str">The prefix string.</param>
+        /// <param name="caseSensitive">Check case-sensitive.</param>
+        /// <returns>Prefix matches.</returns>
+        public bool StartsWith( [NotNull] string str, bool caseSensitive = true )
+        {
+            if( str == null ) throw new ArgumentNullException( nameof( str ) );
 
             return
                 ( str.Length <= Internal.Length )
                 &&
-                Internal.ToString( 0, str.Length ).Equals( str, caseSeinsitive ? Ordinal : OrdinalIgnoreCase );
+                Internal.ToString( 0, str.Length ).Equals( str, caseSensitive ? Ordinal : OrdinalIgnoreCase );
         }
 
-        public bool EndsWith( [NotNull] string str, bool caseSeinsitive = true )
+        /// <summary>
+        /// Check string ends with a given text.
+        /// </summary>
+        /// <param name="str">The postfix string.</param>
+        /// <param name="caseSensitive">Check case-sensitive.</param>
+        /// <returns>postfix matches.</returns>
+        public bool EndsWith( [NotNull] string str, bool caseSensitive = true )
         {
-            if( str == null )
-            {
-                throw new ArgumentNullException( nameof( str ) );
-            }
+            if( str == null ) throw new ArgumentNullException( nameof( str ) );
 
-            throw new NotImplementedException();
+            return
+                ( str.Length <= Internal.Length )
+                &&
+                Internal.ToString( Internal.Length - str.Length, str.Length ).Equals( str, caseSensitive ? Ordinal : OrdinalIgnoreCase );
         }
 
         public bool Contains( [NotNull] string str, bool caseSeinsitive = true )
@@ -659,14 +717,30 @@
                 ( Internal.ToString().IndexOf( str, caseSeinsitive ? Ordinal : OrdinalIgnoreCase ) != -1 );
         }
 
+        /// <summary>
+        /// Uppercase the string.
+        /// </summary>
+        /// <returns>The string with uppercase letters.</returns>
         public Superstring ToUpper()
         {
-            throw new NotImplementedException();
+            for( var i = 0; i < Internal.Length; i++ )
+            {
+                Internal[i] = char.ToUpperInvariant( Internal[i] );
+            }
+            return this;
         }
 
+        /// <summary>
+        /// Lowercase the string.
+        /// </summary>
+        /// <returns>The string with lowercase letters.</returns>
         public Superstring ToLower()
         {
-            throw new NotImplementedException();
+            for( var i = 0; i < Internal.Length; i++ )
+            {
+                Internal[i] = char.ToLowerInvariant( Internal[i] );
+            }
+            return this;
         }
 
         public Superstring Wrap( int lineLength, string separator = null )
@@ -674,6 +748,12 @@
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Replaces all occurrence in string.
+        /// </summary>
+        /// <param name="pattern">Pattern to search for.</param>
+        /// <param name="replacement">The text to be substituted.</param>
+        /// <returns>The new string.</returns>
         public Superstring Replace( string pattern, string replacement )
         {
             if( pattern == null )
@@ -684,33 +764,43 @@
             return this;
         }
 
+        /// <summary>
+        /// Replaces all occurrence in string.
+        /// </summary>
+        /// <param name="replacements">Pattern - substitution pairs.</param>
+        /// <returns>The new string.</returns>
         public Superstring Replace( IReadOnlyDictionary<string, string> replacements )
         {
             if( replacements == null )
             {
                 return this;
             }
-            foreach( var pair in replacements )
+            lock( SyncRoot )
             {
-                if( string.IsNullOrEmpty( pair.Key ) )
+                foreach( var pair in replacements.Where( pair => ! string.IsNullOrEmpty( pair.Key ) ) )
                 {
-                    continue;
+                    Internal.Replace( pair.Key ?? "", pair.Value ?? "" );
                 }
-                Internal.Replace( pair.Key, pair.Value );
             }
             return this;
         }
 
+        /// <summary>
+        /// Replaces all occurrence in string.
+        /// </summary>
+        /// <param name="pattern">Pattern to search for.</param>
+        /// <param name="replacement">The text to be substituted.</param>
+        /// <returns>The new string.</returns>
         public Superstring Replace( [NotNull] Regex pattern, string replacement )
         {
-            if( pattern == null )
+            if( pattern == null ) throw new ArgumentNullException( nameof( pattern ) );
+            
+            lock( SyncRoot )
             {
-                throw new ArgumentNullException( nameof( pattern ) );
+                var input = Internal.ToString();
+                var replaced = pattern.Replace( input, replacement ?? "" );
+                Internal.Clear().Append( replaced );    
             }
-
-            var input = Internal.ToString();
-            var replaced = pattern.Replace( input, replacement );
-            Internal.Clear().Append( replaced );
             return this;
         }
 
@@ -755,8 +845,8 @@
         {
             bool result;
             return bool.TryParse( Internal.ToString(), out result )
-                       ? result
-                       : default ( bool );
+                ? result
+                : default ( bool );
         }
 
         /// <summary>
@@ -774,8 +864,8 @@
         {
             char result;
             return char.TryParse( Internal.ToString(), out result )
-                       ? result
-                       : default ( char );
+                ? result
+                : default ( char );
         }
 
         /// <summary>
@@ -794,8 +884,8 @@
         {
             sbyte result;
             return sbyte.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( sbyte );
+                ? result
+                : default ( sbyte );
         }
 
         /// <summary>
@@ -813,8 +903,8 @@
         {
             byte result;
             return byte.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( byte );
+                ? result
+                : default ( byte );
         }
 
         /// <summary>
@@ -832,8 +922,8 @@
         {
             short result;
             return short.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( short );
+                ? result
+                : default ( short );
         }
 
         /// <summary>
@@ -852,8 +942,8 @@
         {
             ushort result;
             return ushort.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( ushort );
+                ? result
+                : default ( ushort );
         }
 
         /// <summary>
@@ -871,8 +961,8 @@
         {
             int result;
             return int.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( int );
+                ? result
+                : default ( int );
         }
 
         /// <summary>
@@ -891,8 +981,8 @@
         {
             uint result;
             return uint.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( uint );
+                ? result
+                : default ( uint );
         }
 
         /// <summary>
@@ -910,8 +1000,8 @@
         {
             long result;
             return long.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( long );
+                ? result
+                : default ( long );
         }
 
         /// <summary>
@@ -930,8 +1020,8 @@
         {
             ulong result;
             return ulong.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( ulong );
+                ? result
+                : default ( ulong );
         }
 
         /// <summary>
@@ -949,8 +1039,8 @@
         {
             float result;
             return float.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( float );
+                ? result
+                : default ( float );
         }
 
         /// <summary>
@@ -968,8 +1058,8 @@
         {
             double result;
             return double.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( double );
+                ? result
+                : default ( double );
         }
 
         /// <summary>
@@ -987,8 +1077,8 @@
         {
             decimal result;
             return decimal.TryParse( Internal.ToString(), NumberStyles.Any, provider, out result )
-                       ? result
-                       : default ( decimal );
+                ? result
+                : default ( decimal );
         }
 
         /// <summary>
@@ -1006,8 +1096,8 @@
         {
             DateTime result;
             return DateTime.TryParse( Internal.ToString(), provider, DateTimeStyles.None, out result )
-                       ? result
-                       : default ( DateTime );
+                ? result
+                : default ( DateTime );
         }
 
         /// <summary>
