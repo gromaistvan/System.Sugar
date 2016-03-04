@@ -12,14 +12,14 @@
     public abstract class Array<TItem> : ICloneable, IStructuralComparable, IStructuralEquatable, IList<TItem>, IList
     {
         /// <summary>
-        /// TODO
+        /// Gets value at <paramref name="index"/>.
         /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is not a valid index.</exception>
         protected abstract TItem GetValue( int index );
 
         /// <summary>
-        /// TODO
+        /// Sets item at <paramref name="index"/> to <paramref name="value"/>.
         /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <param name="value">The new value.</param>
@@ -27,18 +27,21 @@
         protected abstract void SetValue( int index, TItem value );
 
         /// <summary>
-        /// TODO
+        /// Get the length of the array.
         /// </summary>
         public abstract int Length { get; }
 
         /// <summary>
-        /// TODO
+        /// Get the length of the array.
         /// </summary>
         public long LongLength => (long)Length;
 
         /// <summary>
-        /// TODO
+        /// Get the dimensions of the array.
         /// </summary>
+        /// <remarks>
+        /// Always 1!
+        /// </remarks>
         public int Rank => 1;
 
         /// <summary>
@@ -114,7 +117,15 @@
 
         int IList.IndexOf( object value )
         {
-            throw new NotImplementedException();
+            for( var i = 0; i < Length; i++ )
+            {
+                object item = GetValue( i );
+                if( Equals( value, item ) )
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         void IList.Insert( int index, object value )
@@ -189,7 +200,15 @@
 
         int IList<TItem>.IndexOf( TItem item )
         {
-            throw new NotImplementedException();
+            for( var i = 0; i < Length; i++ )
+            {
+                var value = GetValue( i );
+                if( Equals( value, item ) )
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         void IList<TItem>.Insert( int index, TItem item )
@@ -205,7 +224,7 @@
         [SuppressMessage( "ReSharper", "SuggestVarOrType_SimpleTypes" )]
         int IStructuralComparable.CompareTo( object other, IComparer comparer )
         {
-            if( other == null )
+            if( ( other == null ) || ( comparer == null ) )
             {
                 return 1;
             }
@@ -226,7 +245,7 @@
 
         bool IStructuralEquatable.Equals( object other, IEqualityComparer comparer )
         {
-            if( other == null )
+            if( ( other == null ) || ( comparer == null ) )
             {
                 return false;
             }
@@ -333,122 +352,90 @@
         };
     }
 
-    sealed class Array0<TItem> : Array<TItem>
+    class Array0<TItem> : Array<TItem>
     {
         public override int Length => 0;
 
         protected override TItem GetValue( int index )
         {
-            throw new IndexOutOfRangeException();
+            if( ( index < 0 ) || ( index >= Length ) ) throw new IndexOutOfRangeException();
+            return default( TItem );
         }
 
         protected override void SetValue( int index, TItem value )
         {
-            throw new IndexOutOfRangeException();
+            if( ( index < 0 ) || ( index >= Length ) ) throw new IndexOutOfRangeException();
         }
     }
 
-    sealed class Array1<TItem> : Array<TItem>
+    class Array1<TItem> : Array0<TItem>
     {
-        TItem _0;
+        protected TItem Pos0;
 
         public override int Length => 1;
 
-        protected override TItem GetValue( int index )
-        {
-            switch( index )
-            {
-                case 0:
-                    return _0;
-                default:
-                    throw new IndexOutOfRangeException();
-            }
-        }
+        protected override TItem GetValue( int index ) =>
+            index == 0
+                ? Pos0
+                : base.GetValue( index );
 
         protected override void SetValue( int index, TItem value )
         {
-            switch( index )
+            if( index == 0 )
             {
-                case 0:
-                    _0 = value;
-                    break;
-                default:
-                    throw new IndexOutOfRangeException();
+                Pos0 = value;
+            }
+            else
+            {
+                base.SetValue( index, value );
             }
         }
     }
 
-    sealed class Array2<TItem> : Array<TItem>
+    class Array2<TItem> : Array1<TItem>
     {
-        TItem _0, _1;
+        protected TItem Pos1;
 
         public override int Length => 2;
 
-        protected override TItem GetValue( int index )
-        {
-            switch( index )
-            {
-                case 0:
-                    return _0;
-                case 1:
-                    return _1;
-                default:
-                    throw new IndexOutOfRangeException();
-            }
-        }
+        protected override TItem GetValue( int index ) =>
+            index == 0
+                ? Pos1
+                : base.GetValue( index );
 
         protected override void SetValue( int index, TItem value )
         {
-            switch( index )
+            if( index == 1 )
             {
-                case 0:
-                    _0 = value;
-                    break;
-                case 1:
-                    _1 = value;
-                    break;
-                default:
-                    throw new IndexOutOfRangeException();
+                Pos1 = value;
+            }
+            else
+            {
+                base.SetValue( index, value );
             }
         }
     }
 
-    sealed class Array3<TItem> : Array<TItem>
+    class Array3<TItem> : Array2<TItem>
     {
-        TItem _0, _1, _2;
+        protected TItem Pos2;
 
         public override int Length => 3;
 
-        protected override TItem GetValue( int index )
-        {
-            switch( index )
-            {
-                case 0:
-                    return _0;
-                case 1:
-                    return _1;
-                case 2:
-                    return _2;
-                default:
-                    throw new IndexOutOfRangeException();
-            }
-        }
+        protected override TItem GetValue( int index ) =>
+            index == 0
+                ? Pos1
+                : base.GetValue( index );
 
         protected override void SetValue( int index, TItem value )
         {
-            switch( index )
+            if( index == 1 )
             {
-                case 0:
-                    _0 = value;
-                    break;
-                case 1:
-                    _1 = value;
-                    break;
-                case 2:
-                    _2 = value;
-                    break;
-                default:
-                    throw new IndexOutOfRangeException();
+                Pos1 = value;
+            }
+            else
+            {
+                base.SetValue( index, value );
             }
         }
     }
