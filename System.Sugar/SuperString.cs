@@ -23,7 +23,7 @@
     ///     <code>
     ///     Superstring str = "Some text";
     ///     str += " to edit.";
-    ///     str[str.Length - 1] = '!';
+    ///     str[infix.Length - 1] = '!';
     ///     </code>
     /// </example>
     [SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type",
@@ -445,7 +445,13 @@
         /// <summary>
         ///     Word count.
         /// </summary>
-        public int Words { get { throw new NotImplementedException(); } }
+        public int Words
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         /// <summary>
         ///     Empty strings are <c>false</c>.
@@ -595,9 +601,9 @@
         /// <summary>
         /// Split string to parts.
         /// </summary>
-        /// <param name="chars">Separator characters.</param>
+        /// <param name="separators">Separator characters.</param>
         /// <returns>String parts.</returns>
-        public IEnumerable<string> Split( params char[] chars ) => Internal.ToString().Split( chars );
+        public IEnumerable<string> Split( params char[] separators ) => Internal.ToString().Split( separators );
 
         /// <summary>
         /// Split string to parts by whitespaces.
@@ -605,7 +611,7 @@
         /// <returns>String parts.</returns>
         public IEnumerable<string> Split() => Internal.ToString().Split( _whiteChars );
 
-        public Superstring Shuffle( params char[] chars )
+        public Superstring Shuffle()
         {
             throw new NotImplementedException();
         }
@@ -662,12 +668,12 @@
         /// <returns>Trimmed string.</returns>
         public Superstring RightTrim() => RightTrim( _extendedWhiteChars );
 
-        public Superstring LeftPad( int count, char @char = ' ' )
+        public Superstring LeftPad( int count, char pad = ' ' )
         {
             throw new NotImplementedException();
         }
 
-        public Superstring RightPad( int count, char @char = ' ' )
+        public Superstring RightPad( int count, char pad = ' ' )
         {
             throw new NotImplementedException();
         }
@@ -675,46 +681,49 @@
         /// <summary>
         /// Check string begins with a given text.
         /// </summary>
-        /// <param name="str">The prefix string.</param>
+        /// <param name="prefix">The prefix string.</param>
         /// <param name="caseSensitive">Check case-sensitive.</param>
         /// <returns>Prefix matches.</returns>
-        public bool StartsWith( [NotNull] string str, bool caseSensitive = true )
+        public bool StartsWith( [NotNull] string prefix, bool caseSensitive = true )
         {
-            if( str == null ) throw new ArgumentNullException( nameof( str ) );
+            if( prefix == null ) throw new ArgumentNullException( nameof( prefix ) );
 
             return
-                ( str.Length <= Internal.Length )
+                ( prefix.Length <= Internal.Length )
                 &&
-                Internal.ToString( 0, str.Length ).Equals( str, caseSensitive ? Ordinal : OrdinalIgnoreCase );
+                Internal.ToString( 0, prefix.Length ).Equals( prefix, caseSensitive ? Ordinal : OrdinalIgnoreCase );
         }
 
         /// <summary>
         /// Check string ends with a given text.
         /// </summary>
-        /// <param name="str">The postfix string.</param>
+        /// <param name="postfix">The postfix string.</param>
         /// <param name="caseSensitive">Check case-sensitive.</param>
-        /// <returns>postfix matches.</returns>
-        public bool EndsWith( [NotNull] string str, bool caseSensitive = true )
+        /// <returns>Postfix matches.</returns>
+        public bool EndsWith( [NotNull] string postfix, bool caseSensitive = true )
         {
-            if( str == null ) throw new ArgumentNullException( nameof( str ) );
+            if( postfix == null ) throw new ArgumentNullException( nameof( postfix ) );
 
             return
-                ( str.Length <= Internal.Length )
+                ( postfix.Length <= Internal.Length )
                 &&
-                Internal.ToString( Internal.Length - str.Length, str.Length ).Equals( str, caseSensitive ? Ordinal : OrdinalIgnoreCase );
+                Internal.ToString( Internal.Length - postfix.Length, postfix.Length ).Equals( postfix, caseSensitive ? Ordinal : OrdinalIgnoreCase );
         }
 
-        public bool Contains( [NotNull] string str, bool caseSeinsitive = true )
+        /// <summary>
+        /// Check string contains a given text.
+        /// </summary>
+        /// <param name="infix">The infix string.</param>
+        /// <param name="caseSeinsitive">Check case-sensitive.</param>
+        /// <returns>Text found.</returns>
+        public bool Contains( [NotNull] string infix, bool caseSeinsitive = true )
         {
-            if( str == null )
-            {
-                throw new ArgumentNullException( nameof( str ) );
-            }
+            if( infix == null ) throw new ArgumentNullException( nameof( infix ) );
 
             return
-                ( str.Length <= Internal.Length )
+                ( infix.Length <= Internal.Length )
                 &&
-                ( Internal.ToString().IndexOf( str, caseSeinsitive ? Ordinal : OrdinalIgnoreCase ) != -1 );
+                ( Internal.ToString().IndexOf( infix, caseSeinsitive ? Ordinal : OrdinalIgnoreCase ) != -1 );
         }
 
         /// <summary>
@@ -804,15 +813,19 @@
             return this;
         }
 
+        /// <summary>
+        /// Reverse the string.
+        /// </summary>
+        /// <returns>The reversed string.</returns>
         public Superstring Reverse()
         {
-            throw new NotImplementedException();
-            return this;
-        }
-
-        public Superstring Shuffle()
-        {
-            throw new NotImplementedException();
+            var length = Internal.Length;
+            for( var i = 0; i < length / 2; i++ )
+            {
+                var swap = Internal[ length - i ];
+                Internal[ length - i ] = Internal[ i ];
+                Internal[ i ] = swap;
+            }
             return this;
         }
 

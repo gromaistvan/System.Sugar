@@ -469,12 +469,14 @@
     {
         protected override int GetLength() => 0;
 
+        [SuppressMessage( "Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes" )]
         public override TItem GetValue( int index )
         {
             if( ( index < 0 ) || ( index >= Length ) ) throw new IndexOutOfRangeException();
             return default( TItem );
         }
 
+        [SuppressMessage( "Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes" )]
         public override void SetValue( TItem value, int index )
         {
             if( ( index < 0 ) || ( index >= Length ) ) throw new IndexOutOfRangeException();
