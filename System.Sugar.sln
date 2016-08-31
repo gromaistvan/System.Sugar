@@ -1,13 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Sugar", "System.Sugar\System.Sugar.csproj", "{A58F56BE-44FB-4CCE-B44B-560BBDF73A87}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49B7BBB9-2FBD-4C86-BD48-FCFD6EAA60F7}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		System.Sugar.ruleset = System.Sugar.ruleset
 	EndProjectSection
 	ProjectSection(FolderGlobals) = preProject
 		__JSONSchema = http://json.schemastore.org/bower

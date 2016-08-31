@@ -14,10 +14,10 @@
     using static StringComparison;
 
     /// <summary>
-    ///     Fancy class for using smart value manipulation.
+    ///     Fancy class for smart string manipulations.
     /// </summary>
     /// <remarks>
-    ///     Lots of syntactic sugar over strung usage.
+    ///     Lots of syntactic sugar over string usage.
     /// </remarks>
     /// <example>
     ///     <code>
